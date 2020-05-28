@@ -30,14 +30,15 @@ void show_states(char **state_list, int len)
     printf("]\n");
 }
 
-void print_currnt_state(enum States *states){
+void print_currnt_state(enum States *states)
+{
 
     int i;
     for(i = 0; i < 2; i++)
     {
         printf(" q%d ", states[i]);
     }
-    printf(" \n ");
+    printf(" \n");
 }
 
 
@@ -54,29 +55,43 @@ void nfa(char* word)
     {
         char currnet_char = word[i];
 
-        if(currnet_char == '#'){
+        /* znak # oznacza konca slowa, wtedy automat zaczyna analizowac kolejne slowo */
+        if(currnet_char == '#')
+        {
             printf("koniec slowa \n\n\n");
             states[0] = q0;
             states[1] = q0;
             //break;
         }
-
-        else if(states[0] == q8 || states[0] == q9)
+        /* gdy osiagnieto stan koncowy to zostajemy w nim do konca slowa */
+        else if(states[0] == q8)
         {
-            printf("still finit is ");
+            states[0] = q8;
+            states[1] = q8;
             print_currnt_state(states);
         }
+        else if(states[0] == q9)
+        {
+            states[0] = q9;
+            states[1] = q9;
+            print_currnt_state(states);
+        }
+
+        /* nie osagnieto stanu koncowego */
         else
         {
+            /* warunki potrzebne do osiagniecia stanu koncowego q8 - powtorzenie wsrod cyfr*/
             int double_zeros = currnet_char == '0' && states[1] == q1;
             int double_ones = currnet_char == '1' && states[1] == q2;
             int double_twos = currnet_char == '2' && states[1] == q3;
             int double_threes = currnet_char == '3' && states[1] == q4;
 
+            /* warunki potrzebne do osiagniecia stanu koncowego q9 - powtorzenie wsrod liter*/
             int double_a = currnet_char == 'a' && states[1] == q5;
             int double_b = currnet_char == 'b' && states[1] == q6;
             int double_c = currnet_char == 'c' && states[1] == q7;
 
+            /* warunki potrzebne do osiagniecia stanu koncowego q8 zostaly spelnione - przechodzimy do stanu koncowego q8*/
             if(double_zeros == 1 || double_ones == 1 || double_twos == 1 || double_threes ==1)
             {
                 states[0] = q8;
@@ -84,6 +99,8 @@ void nfa(char* word)
                 printf("finit state is ", states[1]);
                 print_currnt_state(states);
             }
+
+            /* warunki potrzebne do osiagniecia stanu koncowego q9 zostaly spelnione - przechodzimy do stanu koncowego q9*/
             else if(double_a == 1 || double_b == 1 || double_c == 1)
             {
                 states[0] = q9;
@@ -93,40 +110,44 @@ void nfa(char* word)
             }
             else
             {
-                switch(currnet_char)
+                if(states[0] == q0)
                 {
-                case '0':
-                    states[1] = q1;
-                    break;
-                case '1':
-                    states[1] = q2;
-                    break;
-                case '2':
-                    states[1] = q3;
-                    break;
-                case '3':
-                    states[1] = q4;
-                    break;
-                case 'a':
-                    states[1] = q5;
-                    break;
-                case 'b':
-                    states[1] = q6;
-                    break;
-                case 'c':
-                    states[1] = q7;
-                    break;
-                default:
-                    printf("a");
-                    return -1;
+                    switch(currnet_char)
+                    {
+                    case '0':
+                        states[1] = q1;
+                        break;
+                    case '1':
+                        states[1] = q2;
+                        break;
+                    case '2':
+                        states[1] = q3;
+                        break;
+                    case '3':
+                        states[1] = q4;
+                        break;
+                    case 'a':
+                        states[1] = q5;
+                        break;
+                    case 'b':
+                        states[1] = q6;
+                        break;
+                    case 'c':
+                        states[1] = q7;
+                        break;
+                    default:
+                        printf("a");
+                        return -1;
+                    }
+                    printf("current state is " );
+                    print_currnt_state(states);
                 }
-                printf("current state is " );
-                print_currnt_state(states);
             }
         }
     }
 }
 
+/*  Lista ze strony https://www.geeksforgeeks.org/generic-linked-list-in-c-2/ */
 struct Node
 {
     void  *data;
@@ -135,19 +156,15 @@ struct Node
 
 void push(struct Node** head_ref, void *new_data, size_t data_size)
 {
-    // Allocate memory for node
     struct Node* new_node = (struct Node*)malloc(sizeof(struct Node));
 
     new_node->data  = malloc(data_size);
     new_node->next = (*head_ref);
 
-    // Copy contents of new_data to newly allocated memory.
-    // Assumption: char takes 1 byte.
     int i;
     for (i=0; i<data_size; i++)
         *(char *)(new_node->data + i) = *(char *)(new_data + i);
 
-    // Change head pointer as new node is added at the beginning
     (*head_ref)    = new_node;
 }
 
@@ -160,16 +177,19 @@ void printList(struct Node *node, void (*fptr)(void *))
     }
 }
 
+
 void printState(char *n)
 {
-   printf("%s \n", n);
+    printf("%s \n", n);
 }
+
+/*   Koniec ------------ ----------------------------------------------Listy  */
 
 int main()
 {
     printf("NFA \n\n");
-    char* word = "abcc12";
 
+    char* word = "abcc12";
     //nfa(word);
 
     struct Node *start = NULL;
@@ -179,20 +199,22 @@ int main()
     char* filename = "strings.txt";
 
     fp = fopen(filename, "r");
-    if (fp == NULL){
+    if (fp == NULL)
+    {
         printf("Could not open file %s",filename);
         return 1;
     }
     unsigned size = MAXCHAR*sizeof(char);
-    int licz = 0;
-    while (fgets(str, MAXCHAR, fp) != NULL)
+    while (fgets(str, MAXCHAR, fp) != NULL){
         push(&start, &str, size);
-        licz++;
+    }
+
     fclose(fp);
 
     //printList(start, printState);
-    printf(" licz %d a string to %s \n\n\n", licz, str);
+    printf("String to %s \n\n\n", str);
     nfa(str);
+
     return 0;
 
 }
