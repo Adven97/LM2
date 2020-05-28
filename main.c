@@ -32,7 +32,7 @@ void show_states(char **state_list, int len)
 
 void print_currnt_state(enum States *states)
 {
-
+    printf("current state is " );
     int i;
     for(i = 0; i < 2; i++)
     {
@@ -40,7 +40,6 @@ void print_currnt_state(enum States *states)
     }
     printf(" \n");
 }
-
 
 void nfa(char* word)
 {
@@ -77,37 +76,7 @@ void nfa(char* word)
             print_currnt_state(states);
         }
 
-        /* nie osagnieto stanu koncowego */
-        else
-        {
-            /* warunki potrzebne do osiagniecia stanu koncowego q8 - powtorzenie wsrod cyfr*/
-            int double_zeros = currnet_char == '0' && states[1] == q1;
-            int double_ones = currnet_char == '1' && states[1] == q2;
-            int double_twos = currnet_char == '2' && states[1] == q3;
-            int double_threes = currnet_char == '3' && states[1] == q4;
-
-            /* warunki potrzebne do osiagniecia stanu koncowego q9 - powtorzenie wsrod liter*/
-            int double_a = currnet_char == 'a' && states[1] == q5;
-            int double_b = currnet_char == 'b' && states[1] == q6;
-            int double_c = currnet_char == 'c' && states[1] == q7;
-
-            /* warunki potrzebne do osiagniecia stanu koncowego q8 zostaly spelnione - przechodzimy do stanu koncowego q8*/
-            if(double_zeros == 1 || double_ones == 1 || double_twos == 1 || double_threes ==1)
-            {
-                states[0] = q8;
-                states[1] = q8;
-                printf("finit state is ", states[1]);
-                print_currnt_state(states);
-            }
-
-            /* warunki potrzebne do osiagniecia stanu koncowego q9 zostaly spelnione - przechodzimy do stanu koncowego q9*/
-            else if(double_a == 1 || double_b == 1 || double_c == 1)
-            {
-                states[0] = q9;
-                states[1] = q9;
-                printf("finit state is ");
-                print_currnt_state(states);
-            }
+        /* nie osiagnieto stanu koncowego */
             else
             {
                 if(states[0] == q0)
@@ -115,35 +84,77 @@ void nfa(char* word)
                     switch(currnet_char)
                     {
                     case '0':
-                        states[1] = q1;
+                        if(states[1]==q1){
+                            states[0] = q8;
+                            states[1] = q8;
+                        }
+                        else{
+                            states[1] = q1;
+                        }
+
                         break;
                     case '1':
-                        states[1] = q2;
+                        if(states[1]==q2){
+                            states[0] = q8;
+                            states[1] = q8;
+                        }
+                        else{
+                            states[1] = q2;
+                        }
                         break;
                     case '2':
-                        states[1] = q3;
+                        if(states[1]==q3){
+                            states[0] = q8;
+                            states[1] = q8;
+                        }
+                        else{
+                            states[1] = q3;
+                        }
                         break;
                     case '3':
-                        states[1] = q4;
+                        if(states[1]==q4){
+                            states[0] = q8;
+                            states[1] = q8;
+                        }
+                        else{
+                            states[1] = q4;
+                        }
                         break;
                     case 'a':
-                        states[1] = q5;
+                        if(states[1]==q5){
+                            states[0] = q9;
+                            states[1] = q9;
+                        }
+                        else{
+                            states[1] = q5;
+                        }
                         break;
                     case 'b':
-                        states[1] = q6;
+                        if(states[1]==q6){
+                            states[0] = q9;
+                            states[1] = q9;
+                        }
+                        else{
+                            states[1] = q6;
+                        }
                         break;
                     case 'c':
-                        states[1] = q7;
+                        if(states[1]==q7){
+                            states[0] = q9;
+                            states[1] = q9;
+                        }
+                        else{
+                            states[1] = q7;
+                        }
                         break;
                     default:
-                        printf("a");
+                        printf("byq -1");
                         return -1;
                     }
-                    printf("current state is " );
                     print_currnt_state(states);
                 }
             }
-        }
+
     }
 }
 
@@ -206,7 +217,7 @@ int main()
     }
     unsigned size = MAXCHAR*sizeof(char);
     while (fgets(str, MAXCHAR, fp) != NULL){
-        push(&start, &str, size);
+        //push(&start, &str, size);
     }
 
     fclose(fp);
